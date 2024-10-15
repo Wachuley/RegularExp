@@ -2,17 +2,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-typedef struct nodo {
-    struct nodo *sig;
-    struct nodo *ant;
-    char dato[50];
-} TNodo;
-
-typedef struct {
-    TNodo *inicio;
-    TNodo *fin;
-} TLista;
-
 TNodo *CreaNodo(const char d[]) {
     TNodo *ptr;
 
