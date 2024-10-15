@@ -1,6 +1,4 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
+#include "main.h"
 
 TNodo *CreaNodo(const char d[]) {
     TNodo *ptr;
