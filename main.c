@@ -1,58 +1,128 @@
 #include "main.h"
 
-TNodo *CreaNodo(const char d[]) {
-    TNodo *ptr;
+void Libera(TNodo *cab){
+    TNodo *ptr = cab, *aux;
 
-    ptr = (TNodo *)malloc(sizeof(TNodo));
-    if (ptr == NULL) {
-        printf("ERROR\n");
-        exit(1);
-    }
-
-    strcpy(ptr->dato, d);
-    ptr->sig = ptr->ant = NULL;
-    return ptr;
-}
-
-void Libera(TLista *lista) {
-    TNodo *ptr = lista->inicio, *aux;
-
-    while (ptr != NULL) {
+    while (ptr != NULL){
         aux = ptr;
         ptr = ptr->sig;
         free(aux);
     }
 }
 
-void Imprime(TLista *lista) {
-    TNodo *ptr = lista->inicio;
+TNodo *CreaNodo(char str[]){ //crea nodos simples
+	TNodo *ptr=(TNodo*)malloc(sizeof(TNodo));
+	if(ptr){
+        strcpy(ptr->dato, str);
+        ptr->sig=ptr->ant=NULL;
+		return ptr;
+	}
+	printf("Error al reservar memoria");
+	exit(0);
+}
 
-    printf("Imprimiendo...\n\n");
+void InsertaFinal(TNodo **cab, char string[]){
+	TNodo *nodo=CreaNodo(string);
 
-    while (ptr->sig!= NULL) {
-        printf("%s", ptr->dato);
+	if(*cab==NULL){
+        *cab=nodo;
+	} else{
+	    TNodo *aux=cab;
+        while(aux->sig!=NULL)
+            aux=aux->sig;
+
+	    aux->sig=nodo;
+	    nodo->ant=aux;
+	}
+}
+
+void Imprime(TNodo *cab){
+    TNodo *ptr = cab;
+    int i;
+
+    while (ptr->sig!= NULL){
+        printf("%s\n", ptr->dato);
         ptr = ptr->sig;
     }
 }
 
-void InsertaFinal(TLista *lista, char d[]) {
-    TNodo *nodo = CreaNodo(d);
+void Paso1(TNodo *cab){
+    TNodo *ptr=cab;
+    TNodo *eliminar;
+    int i;
 
-    if (lista->inicio == NULL)
-        lista->inicio = lista->fin = nodo;
-    else {
-        nodo->ant = lista->fin;
-        lista->fin = nodo;
-        nodo->ant->sig = nodo;
+    while(ptr->sig!=NULL){
+        if(ptr->dato[0]==ptr->sig->dato[0]){
+            strcat(ptr->dato,"|");
+            strcat(ptr->dato,&ptr->sig->dato[3]);
+
+            eliminar=ptr->sig;
+            ptr->sig=ptr->sig->sig;
+            free(eliminar);
+        }
+        ptr=ptr->sig;
     }
 }
 
-int main() {
+void Paso2(TNodo *cab){
+    TNodo *ptr=cab;
+    char letra, aux[15], aux2;
+    char cad[20]="", aux3[20];
+    int i, j;
+
+    while(ptr!=NULL){
+        letra=ptr->dato[0];
+        i=1;
+
+
+        while(ptr->dato[i]!=letra&&i<strlen(ptr->dato)){
+            i++;
+        }
+        if(i<strlen(ptr->dato)){
+            strcpy(aux, &ptr->dato[i+2]);
+            aux2=ptr->dato[i-1];
+
+            strcpy(cad, "");
+            cad[0]=letra;
+            cad[1]='-';
+            cad[2]='>';
+            cad[3]='{';
+            cad[4]=aux2;
+            cad[5]='}';
+            cad[6]='\0';
+            cad[0]=letra;
+            strcat(cad, &aux);
+            strcpy(ptr->dato, &cad);
+        }
+        ptr=ptr->sig;
+    }
+}
+
+void Paso3(TNodo *ptr){
+    char letra=ptr->sig->dato[0];
+    int i;
+
+    if(ptr->sig!=NULL){
+        printf("(");
+        for(i=3; i<strlen(ptr->dato); i++){
+            if(ptr->dato[i]==letra){
+                Paso3(ptr->sig);
+                i++;
+            }
+            printf("%c",ptr->dato[i]);
+        }
+        printf(")");
+    }
+    if(ptr->sig==NULL){
+        printf(")");
+        return;
+    }
+}
+
+int main(){
     FILE *fptr;
-    char string[100], name[40];
-    TLista lista;
-    lista.inicio = NULL;
-    lista.fin = NULL;
+    char string[20], name[40];
+    TNodo *cab=NULL;
 
     printf("Enter the name of the file: \n");
     scanf("%s", name);
@@ -64,14 +134,28 @@ int main() {
         return 1;
     }
 
-    while (fgets(string, sizeof(string), fptr)) {
-        InsertaFinal(&lista, string);
+    while (fgets(string, sizeof(string), fptr)){
+        string[strlen(string)-1]='\0';
+        InsertaFinal(&cab, string);
     }
+    printf("Archivo:\n");
+    Imprime(cab);
+
+    printf("Paso 1:\n");
+    Paso1(cab);
+    Paso1(cab);
+    Imprime(cab);
+
+    printf("Paso 2:\n");
+    Paso2(cab);
+    Imprime(cab);
+
+    printf("Paso 3:\n");
+    printf("S->");
+    Paso3(cab);
 
     fclose(fptr);
+    Libera(&cab);
 
-    Imprime(&lista);
-
-    Libera(&lista);
-    return 0;
+    return(0);
 }
