@@ -3,16 +3,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef struct nodo {
     struct nodo *sig;
     struct nodo *ant;
-    char dato[50];
+    char dato[20];
 } TNodo;
-
-typedef struct {
-    TNodo *inicio;
-    TNodo *fin;
-} TLista;
 
 #endif
